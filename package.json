@@ -1,0 +1,30 @@
+{
+  "name": "trab-sd",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "broker": "",
+    "publisher": "tsnd publisher",
+    "subscriber": "",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucas8107/trab-sd.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lucas8107/trab-sd/issues"
+  },
+  "homepage": "https://github.com/lucas8107/trab-sd#readme",
+  "devDependencies": {
+    "ts-node-dev": "^1.0.0",
+    "typescript": "^4.0.5"
+  },
+  "dependencies": {
+    "poisson-process": "^1.0.0"
+  }
+}
