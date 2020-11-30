@@ -1,3 +1,7 @@
+examples/
+
+.vscode/
+
 # Logs
 logs
 *.log

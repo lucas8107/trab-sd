@@ -19,15 +19,26 @@ message HelloReply {
 }
 
 service Publisher {
-    rpc Register (SimpleMessage) returns (stream SimpleMessage) {}
-    rpc SendMessage (SimpleMessage) returns (SimpleMessage) {}
+    rpc Register (SimpleMessage) returns (SimpleMessage) {}
+    rpc SendMessage (stream PublisherMessage) returns (SimpleMessage) {}
 }
 
 service Subscriber {
+    rpc GetActiveTags (EmptyArg) returns (ListMessage) {}
     rpc SubscribeToTag (SimpleMessage) returns (stream SimpleMessage) {}
 }
+
+message EmptyArg {}
 
 message SimpleMessage {
     string message = 1;
 }
 
+message ListMessage {
+    repeated string list = 1;
+}
+
+message PublisherMessage {
+    string id = 1;
+    string message = 2;
+}

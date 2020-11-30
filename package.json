@@ -1,31 +1,32 @@
 {
-  "name": "trab-sd",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "example": "examples"
-  },
-  "scripts": {
-    "broker": "node ./broker",
-    "publisher": "node ./publisher",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lucas8107/trab-sd.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/lucas8107/trab-sd/issues"
-  },
-  "homepage": "https://github.com/lucas8107/trab-sd#readme",
-  "dependencies": {
-    "@grpc/grpc-js": "^1.2.0",
-    "@grpc/proto-loader": "^0.5.5",
-    "grpc": "^1.24.4",
-    "poisson-process": "^1.0.0"
-  }
+    "name": "trab-sd",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "directories": {
+        "example": "examples"
+    },
+    "scripts": {
+        "broker": "node ./src/broker",
+        "publisher": "node ./src/publisher",
+        "subscriber": "node ./src/subscriber",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/lucas8107/trab-sd.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/lucas8107/trab-sd/issues"
+    },
+    "homepage": "https://github.com/lucas8107/trab-sd#readme",
+    "dependencies": {
+        "@grpc/grpc-js": "^1.2.0",
+        "@grpc/proto-loader": "^0.5.5",
+        "grpc": "^1.24.4",
+        "poisson-process": "^1.0.0"
+    }
 }
