@@ -25,7 +25,7 @@ service Publisher {
 
 service Subscriber {
     rpc GetActiveTags (EmptyArg) returns (ListMessage) {}
-    rpc SubscribeToTag (SimpleMessage) returns (stream SimpleMessage) {}
+    rpc SubscribeToTag (stream SimpleMessage) returns (stream SimpleMessage) {}
 }
 
 message EmptyArg {}

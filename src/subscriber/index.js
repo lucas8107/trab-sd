@@ -22,13 +22,21 @@ const packageDefinition = protoLoader.loadSync(
 const hello_proto = grpc.loadPackageDefinition(packageDefinition).helloworld;
 
 async function setup() {
-  let tagName = null;
+  let tagName = process.argv.slice(2)[0];
 
   const client = new hello_proto.Subscriber('localhost:50051', grpc.credentials.createInsecure());
 
   await new Promise(((resolve) => {
     client.getActiveTags({}, function (err, response) {
       let tagList = response.list;
+
+      if (tagName && tagList.includes(tagName)) {
+        return resolve();
+      } else {
+        if (tagName)
+          console.log("Tag name does not exist");
+      }
+
       console.log('Available tags:');
       for (let tag of tagList) {
         console.log(tag);
@@ -40,7 +48,7 @@ async function setup() {
             console.log(`You picked ${ans}`);
             tagName = ans;
             rl.close();
-            resolve();
+            return resolve();
           } else {
             return getUserTag();
           }
@@ -52,7 +60,10 @@ async function setup() {
 
   const call = client.subscribeToTag({ message: tagName });
 
+  call.write({ message: tagName });
+
   call.on('data', ({ message }) => {
+    call.write({ message: 'alive' });
     console.log(`From broker: ${message}`);
   });
 

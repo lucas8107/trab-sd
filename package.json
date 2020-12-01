@@ -27,6 +27,7 @@
         "@grpc/grpc-js": "^1.2.0",
         "@grpc/proto-loader": "^0.5.5",
         "grpc": "^1.24.4",
+        "lodash": "^4.17.20",
         "poisson-process": "^1.0.0"
     }
 }
