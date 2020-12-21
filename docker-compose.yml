@@ -1,0 +1,8 @@
+services:
+  db:
+    image: influxdb
+    ports:
+      - 8086:8086
+    environment:
+      - INFLUXDB_ADMIN_USER=my-user
+      - INFLUXDB_ADMIN_PASSWORD=my-password
