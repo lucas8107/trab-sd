@@ -26,9 +26,12 @@
     "dependencies": {
         "@grpc/grpc-js": "^1.2.0",
         "@grpc/proto-loader": "^0.5.5",
+        "@influxdata/influxdb-client": "^1.9.0",
+        "@influxdata/influxdb-client-apis": "^1.9.0",
         "axios": "^0.21.0",
         "grpc": "^1.24.4",
         "lodash": "^4.17.20",
-        "poisson-process": "^1.0.0"
+        "poisson-process": "^1.0.0",
+        "yargs": "^16.2.0"
     }
 }

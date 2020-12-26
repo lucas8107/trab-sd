@@ -3,6 +3,9 @@ const path = require("path");
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 
+const { setupDatabase } = require("./setupDB");
+const { influxClient } = require("./influxClient");
+
 const AVAILABLE_TAGS = [
   'trial',
   'license',
@@ -36,7 +39,7 @@ function register(call, callback) {
 
 function sendMessage(call) {
   let firstMessage = true;
-  call.on('data', ({ id, message }) => {
+  call.on('data', async ({ id, message }) => {
     if (firstMessage) {
       call.on('end', async () => {
         for (let i in publishers[id]) {
@@ -48,6 +51,9 @@ function sendMessage(call) {
       });
       firstMessage = false;
     }
+
+    console.log('w');
+    await influxClient.write(message, 'm');
 
     if (!_.isEmpty(publishers[id])) {
       for (let i in publishers[id]) {
@@ -73,12 +79,13 @@ const getRandomInt = (min, max) => {
 
 const subscribeToTag = (call) => {
   let firstMessage = true;
-  call.on('data', ({ message }) => {
+  call.on('data', async ({ message }) => {
     if (firstMessage) {
       if (!(message in publishers)) {
         call.write({ message: 'No publisher with given tag' });
         call.end();
       } else {
+        await influxClient.read('m');
         let id = getRandomInt(1, 500000);
         while (id in publishers[message])
           id = getRandomInt(1, 500000);
@@ -94,13 +101,14 @@ const subscribeToTag = (call) => {
   });
 }
 
-function setup() {
+async function setup() {
   const server = new grpc.Server();
   server.addService(hello_proto.Publisher.service, { register, sendMessage });
   server.addService(hello_proto.Subscriber.service, { subscribeToTag, getActiveTags });
   server.bindAsync('0.0.0.0:50051', grpc.ServerCredentials.createInsecure(), () => {
     server.start();
   });
+  await setupDatabase("mydb", "1h");
 }
 
 setup();

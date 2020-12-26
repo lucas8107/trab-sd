@@ -30,6 +30,13 @@ service Subscriber {
 
 message EmptyArg {}
 
+message FinalMessage {
+  string tag = 1;
+  int64 id = 2;
+  string date = 3;
+  string content = 4;
+}
+
 message SimpleMessage {
     string message = 1;
 }

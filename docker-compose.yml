@@ -6,3 +6,4 @@ services:
     environment:
       - INFLUXDB_ADMIN_USER=my-user
       - INFLUXDB_ADMIN_PASSWORD=my-password
+      - INFLUXDB_HTTP_FLUX_ENABLED=true
