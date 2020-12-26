@@ -30,7 +30,7 @@ class InfluxClient {
   }
 
   async read(tag) {
-    const query = `from(bucket: "${bucket}") |> range(start: -1h) |> filter(fn: (r) => r._measurement == "${tag}")`;
+    const query = `from(bucket: "${bucket}") |> filter(fn: (r) => r._measurement == "${tag}")`;
     const data = await this.queryAPI.collectRows(query);
     console.log(data);
     return data;
