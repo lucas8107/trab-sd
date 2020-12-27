@@ -1,6 +1,16 @@
 # trab-sd
 Using influxdb to keep data
 
+Tag must be picked from the following list:
+```javascript
+[
+  'trial',
+  'license',
+  'support',
+  'bug'
+]
+```
+
 ## Docker-compose
 ```
 docker-compose up
