@@ -22,18 +22,17 @@ class InfluxClient {
     this.queryAPI = influxDB.getQueryApi('');
   }
 
-  async write(message, tag) {
+  async write(message, tag, id) {
     const point = new Point(tag)
       .stringField('msg', message);
     this.writeAPI.writePoint(point);
     await this.writeAPI.flush();
   }
 
-  async read(tag) {
-    const query = `from(bucket: "${bucket}") |> filter(fn: (r) => r._measurement == "${tag}")`;
+  async read(tag, range) {
+    const query = `from(bucket: "${bucket}") |> range(start: -${range || 1}h) |> filter(fn: (r) => r._measurement == "${tag}")`;
     const data = await this.queryAPI.collectRows(query);
-    console.log(data);
-    return data;
+    return data.map((el) => el._value);
   }
 }
 

@@ -1,3 +1,4 @@
+const process = require("process");
 const _ = require("lodash");
 const path = require("path");
 const grpc = require("@grpc/grpc-js");
@@ -12,6 +13,15 @@ const AVAILABLE_TAGS = [
   'support',
   'bug'
 ];
+
+const TAG_IDS = {
+  'trial': 0,
+  'license': 0,
+  'support': 0,
+  'bug': 0
+};
+
+let dbRetainTimeHours = 1;
 
 const PROTO_PATH = path.join(__dirname, '..', 'protos/helloworld.proto');
 
@@ -34,30 +44,30 @@ function register(call, callback) {
   if (tagName in publishers)
     return callback(null, { message: 'tag already registered.' });
   publishers[tagName] = {};
-  return callback(null, { message: 'registration successful.' });
+  return callback(null, { message: `registration successful.|${TAG_IDS[tagName]}` });
 }
 
 function sendMessage(call) {
   let firstMessage = true;
-  call.on('data', async ({ id, message }) => {
+  call.on('data', async ({ tag, id, timestamp, message }) => {
     if (firstMessage) {
       call.on('end', async () => {
-        for (let i in publishers[id]) {
-          publishers[id][i].write({ message: "The publisher lost connection." });
-          await publishers[id][i].end();
+        for (let i in publishers[tag]) {
+          publishers[tag][i].write({ message: "The publisher lost connection." });
+          await publishers[tag][i].end();
         }
-        delete publishers[id];
-        console.log(`Disconnected: ${JSON.stringify(id)}`);
+        delete publishers[tag];
+        console.log(`Disconnected: ${JSON.stringify(tag)}`);
       });
       firstMessage = false;
     }
 
-    console.log('w');
-    await influxClient.write(message, 'm');
+    TAG_IDS[tag] = +id + 1;
+    await influxClient.write(`${tag}|${id}|${timestamp}|${message}`, tag);
 
-    if (!_.isEmpty(publishers[id])) {
-      for (let i in publishers[id]) {
-        publishers[id][i].write({ message });
+    if (!_.isEmpty(publishers[tag])) {
+      for (let i in publishers[tag]) {
+        publishers[tag][i].write({ message: `${tag}|${id}|${timestamp}|${message}` });
       }
     }
   });
@@ -80,19 +90,31 @@ const getRandomInt = (min, max) => {
 const subscribeToTag = (call) => {
   let firstMessage = true;
   call.on('data', async ({ message }) => {
+    console.log(message);
     if (firstMessage) {
       if (!(message in publishers)) {
         call.write({ message: 'No publisher with given tag' });
         call.end();
       } else {
-        await influxClient.read('m');
+        // await call.write({message: `Fetching messages sent within the last ${1} hour(s)`});
+        const pastMessages = await influxClient.read(message, dbRetainTimeHours);
+        // for(msg of pastMessages) {
+          // console.log(msg);
+          // await call.write({message: msg});
+        // }
         let id = getRandomInt(1, 500000);
         while (id in publishers[message])
           id = getRandomInt(1, 500000);
         publishers[message][+id] = call;
+
+        for(msg of pastMessages) {
+          publishers[message][+id].write({ message: msg });
+        }
+
         call.on('end', () => {
           console.log(`Lost subscriber with id ${id}`);
-          delete publishers[message][+id];
+          if(publishers[message])
+            delete publishers[message][+id];
         });
       }
       firstMessage = false;
@@ -102,13 +124,27 @@ const subscribeToTag = (call) => {
 }
 
 async function setup() {
+  let args = process.argv.slice(2);
+
+  dbRetainTimeHours = Math.ceil(Number(args[0]));
+
+  if(!dbRetainTimeHours) {
+    console.log("Provide a retain time (integer hour)");
+    return;
+  }
+
+  if(isNaN(dbRetainTimeHours)) {
+    console.log("The value provided should be a number");
+  }
+
   const server = new grpc.Server();
   server.addService(hello_proto.Publisher.service, { register, sendMessage });
   server.addService(hello_proto.Subscriber.service, { subscribeToTag, getActiveTags });
   server.bindAsync('0.0.0.0:50051', grpc.ServerCredentials.createInsecure(), () => {
     server.start();
   });
-  await setupDatabase("mydb", "1h");
+
+  await setupDatabase("mydb", `${dbRetainTimeHours}h`);
 }
 
 setup();

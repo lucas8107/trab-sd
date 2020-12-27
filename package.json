@@ -31,7 +31,6 @@
         "axios": "^0.21.0",
         "grpc": "^1.24.4",
         "lodash": "^4.17.20",
-        "poisson-process": "^1.0.0",
-        "yargs": "^16.2.0"
+        "poisson-process": "^1.0.0"
     }
 }
